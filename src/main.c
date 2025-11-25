@@ -1,5 +1,4 @@
 #include "colors.h"
-#include "render.h"
 #include "shapes.h"
 #include "types.h"
 #include "utils.h"
@@ -31,11 +30,16 @@ int main(void) {
   Game game = {.render_w = 800, .render_h = 600};
   MouseInteract mouse = {{0}, .drag_idx = -1, .r = 8};
 
-  // test triangle
+  // test quad
   v2i p1 = {100, 100};
-  v2i p2 = {300, 300};
-  v2i p3 = {180, 500};
+  v2i p2 = {500, 100};
+  v2i p3 = {100, 500};
   v2i verts[3] = {p1, p2, p3};
+
+  v2i p4 = {500, 100};
+  v2i p5 = {500, 500};
+  v2i p6 = {100, 500};
+  v2i verts1[3] = {p4, p5, p6};
 
   const char *title = "A: Hello Window";
   game.pitch = game.render_w * sizeof(u32);
@@ -162,7 +166,9 @@ int main(void) {
 
     // draw
     draw_triangle_dots(game.buffer, game.render_w, game.render_h, verts[0],
-                       verts[1], verts[2], WHITE, FILLED);
+                       verts[1], verts[2], WHITE, WIREFRAME);
+    draw_triangle_dots(game.buffer, game.render_w, game.render_h, verts1[0],
+                       verts1[1], verts1[2], WHITE, WIREFRAME);
 
     SDL_UpdateTexture(game.texture, NULL, game.buffer, game.pitch);
     SDL_RenderClear(game.renderer);

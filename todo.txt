@@ -1,11 +1,15 @@
-- add draw_triangle_filled, and circle 
-- test it out on squares and other shapes
 
 - try and make drawing shapes easier, propably in normalized space.
+
+- go 3D so add projection matrix and transformations. 
+GOAL: get a square / pane to render in 3D space with camera movement. 
+
+- once the basic functionality is in place, think and plan about the 
+structure of the engine / future library.
+- and give it a name for the repo as well. 
+
+-> then: 
 - refine structure, e.g seperation of code into files, file structure, 
 small main loop, streamline shape creation, vertexes etc..., add more functions to simplify that
-- keep dragging of vertexes independent of individual shapes, e.g not hardcoded.
-for that maybe store all vertexes in a .txt, then if left mouse button is clicked
-loop through that file to see if its a valid vertex, mutate it. or ask codex for a better solution.
 - so engine.c propably? 
 

@@ -22,7 +22,7 @@ void draw_triangle(u32 *buffer, int w, int h, v2i p1, v2i p2, v2i p3, u32 color,
     for (int y = y_start; y < y_end; y++) {
       // which edges are active
       float xa, xb;
-      if (y < p2.y || p1.y == p2.y) {
+      if (y < p2.y) {
         // upper part (p1 -> p3 && p1 -> p2)
         xa = p1.x + (float)(p3.x - p1.x) * (y - p1.y) / (float)(p3.y - p1.y);
         xb = p1.x + (float)(p2.x - p1.x) * (y - p1.y) / (float)(p2.y - p1.y);
@@ -47,7 +47,7 @@ void draw_triangle(u32 *buffer, int w, int h, v2i p1, v2i p2, v2i p3, u32 color,
         continue;
 
       // fill out
-      for (int x = xl; x < xr; x++)
+      for (int x = xl; x <= xr; x++)
         set_pixel(buffer, w, (v2i){x, y}, color);
     }
   }
@@ -73,7 +73,7 @@ void draw_triangle_dots(u32 *buffer, int w, int h, v2i p1, v2i p2, v2i p3,
     for (int y = y_start; y < y_end; y++) {
       // which edges are active
       float xa, xb;
-      if (y < p2.y || p1.y == p2.y) {
+      if (y < p2.y) {
         // upper part (p1 -> p3 && p1 -> p2)
         xa = p1.x + (float)(p3.x - p1.x) * (y - p1.y) / (float)(p3.y - p1.y);
         xb = p1.x + (float)(p2.x - p1.x) * (y - p1.y) / (float)(p2.y - p1.y);
@@ -98,7 +98,7 @@ void draw_triangle_dots(u32 *buffer, int w, int h, v2i p1, v2i p2, v2i p3,
         continue;
 
       // fill out
-      for (int x = xl; x < xr; x++)
+      for (int x = xl; x <= xr; x++)
         set_pixel(buffer, w, (v2i){x, y}, color);
     }
     draw_cirlcei(buffer, w, p1, 5, RED);
