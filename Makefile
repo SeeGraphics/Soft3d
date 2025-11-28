@@ -8,28 +8,39 @@ ifeq ($(SDL_IMAGE_LIBS),)
 SDL_IMAGE_LIBS := -lSDL2_image
 endif
 
-CFLAGS := -Wall -std=c17 -g -fno-omit-frame-pointer -fsanitize=address,undefined $(SDL_CFLAGS) $(SDL_IMAGE_CFLAGS)
+CFLAGS := -Wall -std=c17 -g -fno-omit-frame-pointer -fsanitize=address,undefined -iquote src $(SDL_CFLAGS) $(SDL_IMAGE_CFLAGS)
 LIBS := $(SDL_LIBS) $(SDL_IMAGE_LIBS)
 
 SRC_DIR := src
 BUILD_DIR := build
 TARGET := game
+DEMO_TARGET := demo
 
 SRCS := $(wildcard $(SRC_DIR)/*.c)
 BIN := $(BUILD_DIR)/$(TARGET)
+DEMO_SRCS := $(filter-out src/main.c,$(SRCS)) $(wildcard demo/*.c)
+DEMO_BIN := $(BUILD_DIR)/$(DEMO_TARGET)
 
-.PHONY: all run clean
+.PHONY: all run demo-run clean
 
 all: $(BIN)
 
 run: $(BIN)
 	$(BIN)
 
+demo: $(DEMO_BIN)
+
+demo-run: $(DEMO_BIN)
+	$(DEMO_BIN)
+
 clean:
 	rm -rf $(BUILD_DIR)
 
 $(BIN): $(SRCS) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(SRCS) -o $(BIN) $(LIBS)
+
+$(DEMO_BIN): $(DEMO_SRCS) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(DEMO_SRCS) -o $(DEMO_BIN) $(LIBS)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
