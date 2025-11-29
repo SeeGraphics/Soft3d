@@ -1,7 +1,8 @@
-# SDL Software Renderer
+# Soft3d - A Software Rendering library written in C with SDL2
 
-Small Software Renderer written in C with SDL2 capable of rendering models and other 3D shapes.
-All of the work is done on the CPU but with the right flags, the performance is actually really good.  
+Soft3d is a library capable of rendering 3D shapes, models (.obj) and voxel demos.
+Im sure you can expand the small voxel demo to a whole minecraft clone.
+You are free to use it in any project you want for any reason, no license. 
 
 ![Cube](images/cube.png)
 ![Model](images/model.png)
