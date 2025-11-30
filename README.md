@@ -1,8 +1,8 @@
 # Soft3d - A Software Rendering library written in C with SDL2
 
-Soft3d is a library capable of rendering 3D shapes, models (.obj) and voxel demos.
-Im sure you can expand the small voxel demo to a whole minecraft clone.
+Soft3d is a library capable of rendering 3D shapes, models (.obj) and more.
 You are free to use it in any project you want for any reason, no license. 
+To see what you can do with this, look at my [Minecraft Clone](https://github.com/SeeGraphics/soft3d-minecraft-clone).
 
 ![Cube](images/cube.png)
 ![Model](images/model.png)
