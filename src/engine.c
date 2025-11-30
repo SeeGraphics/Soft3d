@@ -21,7 +21,8 @@
 #define M_PI_2 1.57079632679489661923
 #endif
 
-typedef struct {
+typedef struct
+{
   u32 window_w;
   u32 window_h;
   u32 render_w;
@@ -36,13 +37,15 @@ typedef struct {
   bool mouse_grabbed;
 } Game;
 
-typedef struct {
+typedef struct
+{
   v3f pos;
   float yaw;
   float pitch;
 } Camera;
 
-typedef struct {
+typedef struct
+{
   Game game;
   Camera camera;
   Texture texture;
@@ -55,12 +58,14 @@ typedef struct {
   float mouse_sens;
 } Engine;
 
-typedef struct {
+typedef struct
+{
   v3f view_pos;
   v2f uv;
 } ClipVert;
 
-static v3f camera_forward(const Camera *cam) {
+static v3f camera_forward(const Camera *cam)
+{
   float cy = cosf(cam->yaw);
   float sy = sinf(cam->yaw);
   float cp = cosf(cam->pitch);
@@ -68,14 +73,17 @@ static v3f camera_forward(const Camera *cam) {
   return v3_normalize((v3f){sy * cp, sp, -cy * cp});
 }
 
-static void clear_depth(float *depth, size_t count) {
-  for (size_t i = 0; i < count; i++) {
+static void clear_depth(float *depth, size_t count)
+{
+  for (size_t i = 0; i < count; i++)
+  {
     depth[i] = 1.0f;
   }
 }
 
 static void resize_render(Game *game, int window_w, int window_h,
-                          int render_scale) {
+                          int render_scale)
+{
   game->window_w = (u32)window_w;
   game->window_h = (u32)window_h;
   game->render_w = (u32)(window_w / render_scale);
@@ -86,12 +94,14 @@ static void resize_render(Game *game, int window_w, int window_h,
     game->render_h = 1;
 
   buffer_reallocate(&game->buffer, game->render_w, game->render_h, sizeof(u32));
-  if (game->depth) {
+  if (game->depth)
+  {
     free(game->depth);
   }
   game->depth = malloc(game->render_w * game->render_h * sizeof(float));
   pitch_update(&game->pitch, game->render_w, sizeof(u32));
-  if (game->renderer) {
+  if (game->renderer)
+  {
     texture_recreate(&game->texture, game->renderer, game->render_w,
                      game->render_h);
   }
@@ -131,12 +141,17 @@ static const Vertex3D cube_vertices[] = {
 };
 
 static const int cube_indices[][3] = {
-    {0, 1, 2},    {0, 2, 3},    // front
-    {4, 5, 6},    {4, 6, 7},    // back
-    {8, 9, 10},   {8, 10, 11},  // left
-    {12, 13, 14}, {12, 14, 15}, // right
-    {16, 17, 18}, {16, 18, 19}, // top
-    {20, 21, 22}, {20, 22, 23}  // bottom
+    {0, 1, 2}, {0, 2, 3}, // front
+    {4, 5, 6},
+    {4, 6, 7}, // back
+    {8, 9, 10},
+    {8, 10, 11}, // left
+    {12, 13, 14},
+    {12, 14, 15}, // right
+    {16, 17, 18},
+    {16, 18, 19}, // top
+    {20, 21, 22},
+    {20, 22, 23} // bottom
 };
 
 static const int cube_vertex_count =
@@ -145,10 +160,12 @@ static const int cube_triangle_count =
     (int)(sizeof(cube_indices) / sizeof(cube_indices[0]));
 
 static bool project_vertex(const ClipVert *cv, const mat4 *proj, int render_w,
-                           int render_h, VertexPC *out, int *mask_out) {
+                           int render_h, VertexPC *out, int *mask_out)
+{
   v4f clip = mat4_mul_v4(
       *proj, (v4f){cv->view_pos.x, cv->view_pos.y, cv->view_pos.z, 1.0f});
-  if (clip.w == 0.0f) {
+  if (clip.w == 0.0f)
+  {
     return false;
   }
 
@@ -176,7 +193,8 @@ static bool project_vertex(const ClipVert *cv, const mat4 *proj, int render_w,
   return true;
 }
 
-static bool engine_init(Engine *eng) {
+static bool engine_init(Engine *eng)
+{
   *eng = (Engine){0};
   eng->game.window_w = 800;
   eng->game.window_h = 600;
@@ -187,19 +205,22 @@ static bool engine_init(Engine *eng) {
   resize_render(&eng->game, (int)eng->game.window_w, (int)eng->game.window_h,
                 eng->render_scale);
 
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO) != 0)
+  {
     SDL_Log("Failed to Initialize SDL: %s\n", SDL_GetError());
     return false;
   }
 
-  if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+  if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
+  {
     SDL_Log("Failed to init SDL_image: %s\n", IMG_GetError());
     SDL_Quit();
     return false;
   }
 
   const char *texture_path = "assets/brick.png";
-  if (!texture_load(&eng->texture, texture_path)) {
+  if (!texture_load(&eng->texture, texture_path))
+  {
     IMG_Quit();
     SDL_Quit();
     return false;
@@ -210,7 +231,8 @@ static bool engine_init(Engine *eng) {
       SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                        (int)eng->game.window_w, (int)eng->game.window_h,
                        SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_RESIZABLE);
-  if (eng->game.window == NULL) {
+  if (eng->game.window == NULL)
+  {
     SDL_Log("Failed to create Window: %s\n", SDL_GetError());
     texture_destroy(&eng->texture);
     IMG_Quit();
@@ -221,7 +243,8 @@ static bool engine_init(Engine *eng) {
 
   eng->game.renderer =
       SDL_CreateRenderer(eng->game.window, -1, SDL_RENDERER_ACCELERATED);
-  if (eng->game.renderer == NULL) {
+  if (eng->game.renderer == NULL)
+  {
     SDL_Log("Failed to create Renderer: %s\n", SDL_GetError());
     SDL_DestroyWindow(eng->game.window);
     texture_destroy(&eng->texture);
@@ -241,25 +264,31 @@ static bool engine_init(Engine *eng) {
   return true;
 }
 
-static void engine_shutdown(Engine *eng) {
-  if (eng->game.buffer) {
+static void engine_shutdown(Engine *eng)
+{
+  if (eng->game.buffer)
+  {
     free(eng->game.buffer);
     eng->game.buffer = NULL;
   }
-  if (eng->game.depth) {
+  if (eng->game.depth)
+  {
     free(eng->game.depth);
     eng->game.depth = NULL;
   }
   texture_destroy(&eng->texture);
-  if (eng->game.texture) {
+  if (eng->game.texture)
+  {
     SDL_DestroyTexture(eng->game.texture);
     eng->game.texture = NULL;
   }
-  if (eng->game.renderer) {
+  if (eng->game.renderer)
+  {
     SDL_DestroyRenderer(eng->game.renderer);
     eng->game.renderer = NULL;
   }
-  if (eng->game.window) {
+  if (eng->game.window)
+  {
     SDL_DestroyWindow(eng->game.window);
     eng->game.window = NULL;
   }
@@ -267,41 +296,50 @@ static void engine_shutdown(Engine *eng) {
   SDL_Quit();
 }
 
-static void engine_handle_event(Engine *eng, const SDL_Event *event) {
+static void engine_handle_event(Engine *eng, const SDL_Event *event)
+{
   Game *game = &eng->game;
-  switch (event->type) {
+  switch (event->type)
+  {
   case SDL_QUIT:
     eng->running = false;
     break;
   case SDL_WINDOWEVENT:
-    if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+    if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+    {
       resize_render(&eng->game, event->window.data1, event->window.data2,
                     eng->render_scale);
     }
     break;
   case SDL_MOUSEMOTION:
-    if (game->mouse_grabbed) {
+    if (game->mouse_grabbed)
+    {
       eng->camera.yaw += (float)event->motion.xrel * eng->mouse_sens;
       eng->camera.pitch -= (float)event->motion.yrel * eng->mouse_sens;
     }
     break;
   case SDL_KEYDOWN:
-    if (event->key.keysym.sym == SDLK_ESCAPE) {
+    if (event->key.keysym.sym == SDLK_ESCAPE)
+    {
       eng->running = false;
     }
-    if (event->key.keysym.sym == SDLK_r) {
+    if (event->key.keysym.sym == SDLK_r)
+    {
       eng->wireframe = !eng->wireframe;
     }
-    if (event->key.keysym.sym == SDLK_q) {
+    if (event->key.keysym.sym == SDLK_q)
+    {
       game->mouse_grabbed = !game->mouse_grabbed;
       SDL_SetRelativeMouseMode(game->mouse_grabbed ? SDL_TRUE : SDL_FALSE);
       SDL_ShowCursor(game->mouse_grabbed ? SDL_DISABLE : SDL_ENABLE);
     }
-    if (event->key.keysym.sym == SDLK_7) {
+    if (event->key.keysym.sym == SDLK_7)
+    {
       Uint32 flags = SDL_GetWindowFlags(game->window);
       bool is_full = (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
       if (SDL_SetWindowFullscreen(
-              game->window, is_full ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) == 0) {
+              game->window, is_full ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) == 0)
+      {
         int w, h;
         SDL_GetWindowSize(game->window, &w, &h);
         resize_render(&eng->game, w, h, eng->render_scale);
@@ -313,7 +351,8 @@ static void engine_handle_event(Engine *eng, const SDL_Event *event) {
   }
 }
 
-static void engine_frame(Engine *eng, Uint32 now, float dt) {
+static void engine_frame(Engine *eng, Uint32 now, float dt)
+{
   Game *game = &eng->game;
   const float world_up_y = 1.0f;
 
@@ -323,36 +362,46 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
   v3f right = v3_normalize(v3_cross(forward, world_up));
 
   float move_speed = 2.5f * dt;
-  if (state[SDL_SCANCODE_W]) {
+  if (state[SDL_SCANCODE_W])
+  {
     eng->camera.pos = v3_add(eng->camera.pos, v3_scale(forward, move_speed));
   }
-  if (state[SDL_SCANCODE_S]) {
+  if (state[SDL_SCANCODE_S])
+  {
     eng->camera.pos = v3_sub(eng->camera.pos, v3_scale(forward, move_speed));
   }
-  if (state[SDL_SCANCODE_A]) {
+  if (state[SDL_SCANCODE_A])
+  {
     eng->camera.pos = v3_sub(eng->camera.pos, v3_scale(right, move_speed));
   }
-  if (state[SDL_SCANCODE_D]) {
+  if (state[SDL_SCANCODE_D])
+  {
     eng->camera.pos = v3_add(eng->camera.pos, v3_scale(right, move_speed));
   }
-  if (state[SDL_SCANCODE_SPACE]) {
+  if (state[SDL_SCANCODE_SPACE])
+  {
     eng->camera.pos.y += move_speed;
   }
-  if (state[SDL_SCANCODE_LCTRL]) {
+  if (state[SDL_SCANCODE_LCTRL])
+  {
     eng->camera.pos.y -= move_speed;
   }
 
   float look_speed = 1.5f * dt;
-  if (state[SDL_SCANCODE_LEFT]) {
+  if (state[SDL_SCANCODE_LEFT])
+  {
     eng->camera.yaw -= look_speed;
   }
-  if (state[SDL_SCANCODE_RIGHT]) {
+  if (state[SDL_SCANCODE_RIGHT])
+  {
     eng->camera.yaw += look_speed;
   }
-  if (state[SDL_SCANCODE_UP]) {
+  if (state[SDL_SCANCODE_UP])
+  {
     eng->camera.pitch += look_speed;
   }
-  if (state[SDL_SCANCODE_DOWN]) {
+  if (state[SDL_SCANCODE_DOWN])
+  {
     eng->camera.pitch -= look_speed;
   }
   float max_pitch = (float)M_PI_2 - 0.1f;
@@ -374,7 +423,8 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
       mat4_perspective((float)M_PI / 3.0f, aspect, eng->near_plane, 100.0f);
   mat4 mv = mat4_mul(view, model);
 
-  typedef struct {
+  typedef struct
+  {
     v2i screen;
     v2f uv;
     v3f view_pos;
@@ -385,7 +435,8 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
   } CachedVertex;
   CachedVertex cached[cube_vertex_count];
 
-  for (int i = 0; i < cube_vertex_count; i++) {
+  for (int i = 0; i < cube_vertex_count; i++)
+  {
     v4f world = {cube_vertices[i].pos.x, cube_vertices[i].pos.y,
                  cube_vertices[i].pos.z, 1.0f};
     v4f view_pos4 = mat4_mul_v4(mv, world);
@@ -395,7 +446,8 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
     cached[i].view_pos = (v3f){view_pos4.x, view_pos4.y, view_pos4.z};
 
     int mask = 0;
-    if (clip.w == 0.0f) {
+    if (clip.w == 0.0f)
+    {
       cached[i].clip_mask = 0x3F; // force cull
       cached[i].depth_ok = false;
       continue;
@@ -423,7 +475,8 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
     cached[i].depth = 0.5f * (ndc.z + 1.0f);
   }
 
-  for (int tri_idx = 0; tri_idx < cube_triangle_count; tri_idx++) {
+  for (int tri_idx = 0; tri_idx < cube_triangle_count; tri_idx++)
+  {
     const int i0 = cube_indices[tri_idx][0];
     const int i1 = cube_indices[tri_idx][1];
     const int i2 = cube_indices[tri_idx][2];
@@ -431,7 +484,8 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
     const CachedVertex *v1 = &cached[i1];
     const CachedVertex *v2 = &cached[i2];
 
-    if ((v0->clip_mask & v1->clip_mask & v2->clip_mask) != 0) {
+    if ((v0->clip_mask & v1->clip_mask & v2->clip_mask) != 0)
+    {
       continue; // frustum culled
     }
 
@@ -440,14 +494,17 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
                        v2->view_pos.z <= -eng->near_plane};
     bool needs_clip = !(near_in[0] && near_in[1] && near_in[2]);
 
-    if (!needs_clip) {
-      if (!v0->depth_ok || !v1->depth_ok || !v2->depth_ok) {
+    if (!needs_clip)
+    {
+      if (!v0->depth_ok || !v1->depth_ok || !v2->depth_ok)
+      {
         continue;
       }
       v3f edge1 = v3_sub(v1->view_pos, v0->view_pos);
       v3f edge2 = v3_sub(v2->view_pos, v0->view_pos);
       v3f normal = v3_cross(edge1, edge2);
-      if (normal.z >= 0.0f) {
+      if (normal.z >= 0.0f)
+      {
         continue; // backface
       }
 
@@ -466,15 +523,20 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
            .depth = v2->depth},
       };
 
-      if (eng->wireframe) {
+      if (eng->wireframe)
+      {
         draw_triangle(game->buffer, game->render_w, game->render_h, pv[0].pos,
                       pv[1].pos, pv[2].pos, WHITE, WIREFRAME);
-      } else {
+      }
+      else
+      {
         draw_textured_triangle(game->buffer, game->depth, game->render_w,
                                game->render_h, &eng->texture, pv[0], pv[1],
                                pv[2]);
       }
-    } else {
+    }
+    else
+    {
       ClipVert in_poly[4] = {
           {.view_pos = v0->view_pos, .uv = v0->uv},
           {.view_pos = v1->view_pos, .uv = v1->uv},
@@ -484,15 +546,19 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
       ClipVert out_poly[4];
       int out_count = 0;
 
-      for (int i = 0; i < in_count; i++) {
+      for (int i = 0; i < in_count; i++)
+      {
         ClipVert a = in_poly[i];
         ClipVert b = in_poly[(i + 1) % in_count];
         bool a_in = a.view_pos.z <= -eng->near_plane;
         bool b_in = b.view_pos.z <= -eng->near_plane;
 
-        if (a_in && b_in) {
+        if (a_in && b_in)
+        {
           out_poly[out_count++] = b;
-        } else if (a_in && !b_in) {
+        }
+        else if (a_in && !b_in)
+        {
           float t =
               (-eng->near_plane - a.view_pos.z) / (b.view_pos.z - a.view_pos.z);
           ClipVert inter = {
@@ -502,7 +568,9 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
               .uv = {a.uv.x + (b.uv.x - a.uv.x) * t,
                      a.uv.y + (b.uv.y - a.uv.y) * t}};
           out_poly[out_count++] = inter;
-        } else if (!a_in && b_in) {
+        }
+        else if (!a_in && b_in)
+        {
           float t =
               (-eng->near_plane - a.view_pos.z) / (b.view_pos.z - a.view_pos.z);
           ClipVert inter = {
@@ -516,14 +584,16 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
         }
       }
 
-      if (out_count < 3) {
+      if (out_count < 3)
+      {
         continue;
       }
 
       int tri_sets[2][3] = {{0, 1, 2}, {0, 2, 3}};
       int tri_total = (out_count == 4) ? 2 : 1;
 
-      for (int t = 0; t < tri_total; t++) {
+      for (int t = 0; t < tri_total; t++)
+      {
         ClipVert *a = &out_poly[tri_sets[t][0]];
         ClipVert *b = &out_poly[tri_sets[t][1]];
         ClipVert *c = &out_poly[tri_sets[t][2]];
@@ -531,7 +601,8 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
         v3f edge1 = v3_sub(b->view_pos, a->view_pos);
         v3f edge2 = v3_sub(c->view_pos, a->view_pos);
         v3f normal = v3_cross(edge1, edge2);
-        if (normal.z >= 0.0f) {
+        if (normal.z >= 0.0f)
+        {
           continue; // backface
         }
 
@@ -542,17 +613,22 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
             !project_vertex(b, &proj, game->render_w, game->render_h, &pv[1],
                             &masks[1]) ||
             !project_vertex(c, &proj, game->render_w, game->render_h, &pv[2],
-                            &masks[2])) {
+                            &masks[2]))
+        {
           continue;
         }
-        if ((masks[0] & masks[1] & masks[2]) != 0) {
+        if ((masks[0] & masks[1] & masks[2]) != 0)
+        {
           continue;
         }
 
-        if (eng->wireframe) {
+        if (eng->wireframe)
+        {
           draw_triangle(game->buffer, game->render_w, game->render_h, pv[0].pos,
                         pv[1].pos, pv[2].pos, WHITE, WIREFRAME);
-        } else {
+        }
+        else
+        {
           draw_textured_triangle(game->buffer, game->depth, game->render_w,
                                  game->render_h, &eng->texture, pv[0], pv[1],
                                  pv[2]);
@@ -572,22 +648,27 @@ static void engine_frame(Engine *eng, Uint32 now, float dt) {
   SDL_RenderPresent(game->renderer);
 }
 
-int engine_run(void) {
+int engine_run(void)
+{
   Engine eng = {0};
-  if (!engine_init(&eng)) {
+  if (!engine_init(&eng))
+  {
     return 1;
   }
 
-  while (eng.running) {
+  while (eng.running)
+  {
     Uint32 now = SDL_GetTicks();
     float dt = (now - eng.last_ticks) / 1000.0f;
     eng.last_ticks = now;
-    if (dt > 0.0f) {
+    if (dt > 0.0f)
+    {
       float inst = 1.0f / dt;
       eng.fps = eng.fps * 0.9f + inst * 0.1f;
     }
 
-    while (SDL_PollEvent(&eng.game.event)) {
+    while (SDL_PollEvent(&eng.game.event))
+    {
       engine_handle_event(&eng, &eng.game.event);
     }
 

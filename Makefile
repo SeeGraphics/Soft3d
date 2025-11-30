@@ -14,7 +14,7 @@ LIBS := $(SDL_LIBS) $(SDL_IMAGE_LIBS)
 SRC_DIR := src
 BUILD_DIR := build
 TARGET := game
-DEMO_TARGET := demo
+MC_TARGET := mc
 MODEL_TARGET := model
 LIB_NAME := libsoft3d.a
 
@@ -24,22 +24,22 @@ CORE_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(CORE_SRCS))
 LIB_STATIC := $(BUILD_DIR)/$(LIB_NAME)
 
 BIN := $(BUILD_DIR)/$(TARGET)
-DEMO_SRCS := $(wildcard demo/*.c)
-DEMO_BIN := $(BUILD_DIR)/$(DEMO_TARGET)
-MODEL_SRCS := $(wildcard model/*.c)
+MC_SRCS := $(wildcard demo/mc*.c)
+MC_BIN := $(BUILD_DIR)/$(MC_TARGET)
+MODEL_SRCS := demo/model_demo.c
 MODEL_BIN := $(BUILD_DIR)/$(MODEL_TARGET)
 
-.PHONY: all run demo demo-run model model-run lib clean
+.PHONY: all run mc mc-run model model-run lib clean
 
 all: $(BIN)
 
 run: $(BIN)
 	$(BIN)
 
-demo: $(DEMO_BIN)
+mc: $(MC_BIN)
 
-demo-run: $(DEMO_BIN)
-	$(DEMO_BIN)
+mc-run: $(MC_BIN)
+	$(MC_BIN)
 
 model: $(MODEL_BIN)
 
@@ -60,8 +60,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 $(BIN): $(LIB_STATIC) $(SRC_DIR)/main.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(SRC_DIR)/main.c $(LIB_STATIC) -o $(BIN) $(LIBS)
 
-$(DEMO_BIN): $(LIB_STATIC) $(DEMO_SRCS) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(DEMO_SRCS) $(LIB_STATIC) -o $(DEMO_BIN) $(LIBS)
+$(MC_BIN): $(LIB_STATIC) $(MC_SRCS) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(MC_SRCS) $(LIB_STATIC) -o $(MC_BIN) $(LIBS)
 
 $(MODEL_BIN): $(LIB_STATIC) $(MODEL_SRCS) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(MODEL_SRCS) $(LIB_STATIC) -o $(MODEL_BIN) $(LIBS)

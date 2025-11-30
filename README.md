@@ -26,8 +26,8 @@ brew install sdl2 sdl2_image
 make          # build base cube: build/game
 make run      # run cube demo
 
-make demo     # build voxel demo: build/demo
-make demo-run # run voxel demo
+make mc-run      # run voxel demo
+make model-run   # run voxel demo
 ```
 
 ## Controls
